@@ -1,4 +1,4 @@
-// swift-tools-version:5.1
+// swift-tools-version:5.3
 
 import PackageDescription
 
@@ -15,13 +15,25 @@ extension Product {
 }
 
 extension Target {
-  static func rxCocoa() -> [Target] {
-    #if os(Linux)
-      return [.target(name: "RxCocoa", dependencies: ["RxSwift", "RxRelay"])]
-    #else
-      return [.target(name: "RxCocoa", dependencies: ["RxSwift", "RxRelay", "RxCocoaRuntime"])]
-    #endif
-  }
+    static func rxCocoa() -> [Target] {
+        #if os(Linux)
+        return [
+            .target(
+                name: "RxCocoa",
+                dependencies: ["RxSwift", "RxRelay"],
+                resources: [.process("PrivacyInfo.xcprivacy")]
+            )
+        ]
+        #else
+        return [
+            .target(
+                name: "RxCocoa",
+                dependencies: ["RxSwift", "RxRelay", "RxCocoaRuntime"],
+                resources: [.process("PrivacyInfo.xcprivacy")]
+            )
+        ]
+        #endif
+    }
 
   static func rxCocoaRuntime() -> [Target] {
     #if os(Linux)
@@ -60,12 +72,12 @@ let package = Package(
   ] as [[Product]]).flatMap { $0 },
   targets: ([
     [
-      .target(name: "RxSwift", dependencies: []),
-    ], 
+      .target(name: "RxSwift", dependencies: [], resources: [.process("PrivacyInfo.xcprivacy")]),
+    ],
     Target.rxCocoa(),
     Target.rxCocoaRuntime(),
     [
-      .target(name: "RxRelay", dependencies: ["RxSwift"]),
+      .target(name: "RxRelay", dependencies: ["RxSwift"], resources: [.process("PrivacyInfo.xcprivacy")]),
       .target(name: "RxBlocking", dependencies: ["RxSwift"]),
       .target(name: "RxTest", dependencies: ["RxSwift"]),
     ],
